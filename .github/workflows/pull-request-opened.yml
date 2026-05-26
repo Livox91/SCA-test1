@@ -1,0 +1,13 @@
+name: Pull Request Opened
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  pr-opened:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm PR opened trigger
+        run: echo "pull_request.opened fired for PR #${{ github.event.pull_request.number }}"
