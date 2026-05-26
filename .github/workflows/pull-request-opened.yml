@@ -5,6 +5,8 @@ on:
     types:
       - opened
 
+permissions: {}
+
 jobs:
   pr-opened:
     runs-on: ubuntu-latest
