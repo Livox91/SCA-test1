@@ -2,9 +2,20 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Enable CORS
+  app.enableCors();
+
+  // Global exception filter
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Global logging interceptor
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Enable global validation
   app.useGlobalPipes(
@@ -29,8 +40,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`Server running on http://localhost:${process.env.PORT ?? 3000}`);
-  console.log(`API Documentation available at http://localhost:${process.env.PORT ?? 3000}/api/docs`);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  console.log(`\n✨ Server running on http://localhost:${port}`);
+  console.log(`📚 API Documentation available at http://localhost:${port}/api/docs\n`);
 }
 bootstrap();
