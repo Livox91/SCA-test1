@@ -1,0 +1,21 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Book } from './entities/book.entity';
+import { BooksService } from './books.service';
+import { BooksController } from './books.controller';
+import { AuthorsModule } from '../authors/authors.module';
+import { CategoriesModule } from '../categories/categories.module';
+import { Author } from '../authors/entities/author.entity';
+import { Category } from '../categories/entities/category.entity';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Book, Author, Category]),
+    AuthorsModule,
+    CategoriesModule,
+  ],
+  controllers: [BooksController],
+  providers: [BooksService],
+  exports: [BooksService],
+})
+export class BooksModule {}
