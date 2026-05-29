@@ -16,6 +16,7 @@ const authors_module_1 = require("./modules/authors/authors.module");
 const categories_module_1 = require("./modules/categories/categories.module");
 const books_module_1 = require("./modules/books/books.module");
 const orders_module_1 = require("./modules/orders/orders.module");
+const statistics_module_1 = require("./modules/statistics/statistics.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,6 +28,7 @@ exports.AppModule = AppModule = __decorate([
             categories_module_1.CategoriesModule,
             books_module_1.BooksModule,
             orders_module_1.OrdersModule,
+            statistics_module_1.StatisticsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
