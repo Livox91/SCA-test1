@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const books_service_1 = require("./books.service");
 const book_entity_1 = require("./entities/book.entity");
 const create_book_dto_1 = require("./dto/create-book.dto");
+const pagination_dto_1 = require("../../common/dto/pagination.dto");
 let BooksController = class BooksController {
     booksService;
     constructor(booksService) {
@@ -28,6 +29,9 @@ let BooksController = class BooksController {
     }
     findAll() {
         return this.booksService.findAll();
+    }
+    search(searchDto) {
+        return this.booksService.searchBooks(searchDto);
     }
     findByCategory(categoryId) {
         return this.booksService.findByCategory(categoryId);
@@ -64,6 +68,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BooksController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('search'),
+    (0, swagger_1.ApiOkResponse)({ description: 'Search books' }),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [pagination_dto_1.SearchBooksDto]),
+    __metadata("design:returntype", Promise)
+], BooksController.prototype, "search", null);
 __decorate([
     (0, common_1.Get)('by-category/:categoryId'),
     (0, swagger_1.ApiOkResponse)({ description: 'Books by category', type: [book_entity_1.Book] }),

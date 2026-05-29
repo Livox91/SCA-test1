@@ -123,6 +123,34 @@ let BooksService = class BooksService {
         book.stockQuantity += quantity;
         return this.bookRepository.save(book);
     }
+    async searchBooks(searchDto) {
+        const { page = 1, limit = 10, search, category, author, sortBy = 'createdAt', sortOrder = 'DESC' } = searchDto;
+        const skip = (page - 1) * limit;
+        const query = this.bookRepository.createQueryBuilder('book')
+            .leftJoinAndSelect('book.author', 'author')
+            .leftJoinAndSelect('book.category', 'categoryEntity');
+        if (search) {
+            query.andWhere('(book.title ILIKE :search OR book.description ILIKE :search OR author.name ILIKE :search)', { search: `%${search}%` });
+        }
+        if (category) {
+            query.andWhere('categoryEntity.id = :categoryId', { categoryId: category });
+        }
+        if (author) {
+            query.andWhere('author.id = :authorId', { authorId: author });
+        }
+        query.orderBy(`book.${sortBy}`, sortOrder);
+        query.skip(skip).take(limit);
+        const [data, total] = await query.getManyAndCount();
+        const meta = {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            hasNextPage: page * limit < total,
+            hasPreviousPage: page > 1,
+        };
+        return { data, meta };
+    }
 };
 exports.BooksService = BooksService;
 exports.BooksService = BooksService = __decorate([

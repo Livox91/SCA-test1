@@ -3,6 +3,7 @@ import { ApiTags, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { BooksService } from './books.service';
 import { Book } from './entities/book.entity';
 import { CreateBookDto, UpdateBookDto } from './dto/create-book.dto';
+import { SearchBooksDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -19,6 +20,12 @@ export class BooksController {
   @ApiOkResponse({ description: 'All books', type: [Book] })
   findAll(): Promise<Book[]> {
     return this.booksService.findAll();
+  }
+
+  @Get('search')
+  @ApiOkResponse({ description: 'Search books' })
+  search(@Query() searchDto: SearchBooksDto): Promise<{ data: Book[]; meta: any }> {
+    return this.booksService.searchBooks(searchDto);
   }
 
   @Get('by-category/:categoryId')

@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, ILike } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { CreateBookDto, UpdateBookDto } from './dto/create-book.dto';
 import { Author } from '../authors/entities/author.entity';
 import { Category } from '../categories/entities/category.entity';
+import { SearchBooksDto } from '../../common/dto/pagination.dto';
 
 @Injectable()
 export class BooksService {
@@ -138,5 +139,45 @@ export class BooksService {
 
     book.stockQuantity += quantity;
     return this.bookRepository.save(book);
+  }
+
+  async searchBooks(searchDto: SearchBooksDto): Promise<{ data: Book[]; meta: any }> {
+    const { page = 1, limit = 10, search, category, author, sortBy = 'createdAt', sortOrder = 'DESC' } = searchDto;
+    const skip = (page - 1) * limit;
+
+    const query = this.bookRepository.createQueryBuilder('book')
+      .leftJoinAndSelect('book.author', 'author')
+      .leftJoinAndSelect('book.category', 'categoryEntity');
+
+    if (search) {
+      query.andWhere(
+        '(book.title ILIKE :search OR book.description ILIKE :search OR author.name ILIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    if (category) {
+      query.andWhere('categoryEntity.id = :categoryId', { categoryId: category });
+    }
+
+    if (author) {
+      query.andWhere('author.id = :authorId', { authorId: author });
+    }
+
+    query.orderBy(`book.${sortBy}`, sortOrder as 'ASC' | 'DESC');
+    query.skip(skip).take(limit);
+
+    const [data, total] = await query.getManyAndCount();
+
+    const meta = {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPreviousPage: page > 1,
+    };
+
+    return { data, meta };
   }
 }
