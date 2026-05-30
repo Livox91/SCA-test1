@@ -1,6 +1,29 @@
 const crypto = require('crypto');
 
 class PaymentGateway {
+  constructor() {
+    this.stripeApiKey = process.env.STRIPE_SECRET_KEY || 'sk_test_fake_key';
+  }
+
+  /**
+   * Process payment using Stripe
+   */
+  async stripePayment(amount, token) {
+    try {
+      console.log(`Processing Stripe payment: $${amount}`);
+      // In real implementation, would call Stripe API
+      return {
+        id: `stripe_${Date.now()}`,
+        amount,
+        status: 'succeeded',
+        method: 'stripe'
+      };
+    } catch (error) {
+      console.error('Stripe payment error:', error);
+      throw error;
+    }
+  }
+
   async processPayment(req, res) {
     try {
       const { amount, currency, method } = req.body;
